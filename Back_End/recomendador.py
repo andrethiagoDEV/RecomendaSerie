@@ -1,186 +1,122 @@
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from collections import Counter
 
-# ==============================
-# CARREGAR CSV
-# ==============================
+# Carrega o dataset de séries de TV do GitHub
 
-df = pd.read_csv("series_tvmaze.csv")
+df = pd.read_csv("https://raw.githubusercontent.com/andrethiagoDEV/RecomendaSerie/main/series_tvmaze.csv")
 
-print("Dataset carregado!")
+print("Dataset carregado")
 print("Total de séries:", len(df))
 
-# Padronizar colunas
+# Limpeza dos dados
+
 df.columns = df.columns.str.strip().str.lower()
 
-# Padronizar dados
-df["titulo"] = df["titulo"].fillna("").str.strip().str.lower()
+df["titulo"] = df["titulo"].fillna("").str.strip()
 df["genero"] = df["genero"].fillna("")
-df["rating"] = pd.to_numeric(df["rating"], errors="coerce")
+df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0)
 
-# Converter data
 df["ano"] = pd.to_datetime(df["ano"], errors="coerce")
 
-# ==============================
-# TOP SÉRIES DE 2025
-# ==============================
+# Faz as 10 melhores séries de 2025
 
-print("\nRecomendador para usuários novos / Séries mais populares\n")
+print("\n Recomendador para usuários novos / Séries mais populares\n")
 
 series_2025 = df[df["ano"].dt.year == 2025]
 series_2025 = series_2025.sort_values(by="rating", ascending=False)
 
 top_2025 = series_2025.head(10)
 
-print("\nSéries mais populares de 2025:\n")
+print(" Séries mais populares de 2025:\n")
 
 for _, linha in top_2025.iterrows():
     print(f"{linha['titulo']} | Nota: {linha['rating']} | Ano: {linha['ano'].year}")
 
-# ==============================
-# INPUT DO USUÁRIO
-# ==============================
+# Digite as séries favoritas do usuário
 
-favoritas = input("\nDigite algumas séries que você gosta (separadas por vírgula): ")
+print("")
+favoritas = input("Digite algumas séries que você gosta (separadas por vírgula): ")
 favoritas = favoritas.split(",")
 
-# ==============================
-# CRIAR SIMILARIDADE
-# ==============================
 
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# dodos modo (TF-IDF)
 
-# Reduzir dataset (performance)
 df = df.sort_values(by="rating", ascending=False).head(3000)
 df = df.reset_index(drop=True)
 
-vectorizer = CountVectorizer()
-matriz = vectorizer.fit_transform(df["genero"])
+df["conteudo"] = df["genero"] + " " + df["titulo"]
+
+vectorizer = TfidfVectorizer(stop_words="english")
+matriz = vectorizer.fit_transform(df["conteudo"])
 
 similaridade = cosine_similarity(matriz)
 
-# ==============================
-# FUNÇÃO DE RECOMENDAÇÃO
-# ==============================
+# faz uma busca mais flexível, ignorando maiúsculas, espaços e acentos
+
+def buscar_titulo(titulo):
+    titulo = titulo.strip().lower()
+
+    resultados = df[df["titulo"].str.lower().str.contains(titulo, na=False)]
+
+    if len(resultados) == 0:
+        return None
+
+    return resultados.iloc[0]["titulo"]
+
+# Faz a recomendação indibidual
 
 def recomendar(titulo):
 
-    titulo = titulo.strip().lower()
+    titulo_original = titulo
+    titulo = buscar_titulo(titulo)
 
-    filtro = df["titulo"].str.contains(titulo, na=False)
-
-    if not filtro.any():
-        print(f"\nSérie '{titulo}' não encontrada.")
+    if titulo is None:
+        print(f"\n Série '{titulo_original}' não encontrada.")
         return None
 
-    indice = df[filtro].index[0]
+    indice = df[df["titulo"] == titulo].index[0]
 
     scores = list(enumerate(similaridade[indice]))
+
+    # ranking híbrido (similaridade + nota)
+    scores = [
+        (i, s * 0.7 + df.iloc[i]["rating"] * 0.3)
+        for i, s in scores
+    ]
+
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
     recomendacoes = scores[1:6]
 
-    return df.iloc[[i[0] for i in recomendacoes]][["titulo", "rating", "ano"]]
+    resultado = df.iloc[[i[0] for i in recomendacoes]][["titulo", "rating", "ano"]]
 
-# ==============================
-# MOSTRAR RECOMENDAÇÕES
-# ==============================
+    return resultado
 
-for serie in favoritas:
+# Recomendações por série favorita do usuário
 
-    serie = serie.strip()
+favoritas_validas = [f.strip() for f in favoritas if f.strip() != ""]
+
+contador = Counter()
+
+for serie in favoritas_validas:
 
     rec = recomendar(serie)
 
     if rec is not None:
 
-        print(f"\n🔎 Recomendações baseadas em: {serie}\n")
+        print(f"\n Recomendações baseadas em '{serie}':\n")
 
         for _, linha in rec.iterrows():
-            ano = linha["ano"].year if pd.notnull(linha["ano"]) else "N/A"
-            print(f"- {linha['titulo']} | Nota: {linha['rating']} | Ano: {ano}")
+            print(f"- {linha['titulo']} | Nota: {linha['rating']} | Ano: {linha['ano'].year}")
+            contador.update([linha["titulo"]])
 
-# ==============================
-# EXTRA (MULTIPLAS FAVORITAS)
-# ==============================
+# Resultado Final
 
-def recomendar_por_favoritas(lista):
+if len(favoritas_validas) > 1:
 
-    recomendacoes = []
+    print("\n Recomendações finais (mais relevantes):\n")
 
-    for serie in lista:
-
-        rec = recomendar(serie.strip())
-
-        if rec is not None:
-            recomendacoes.extend(rec["titulo"].tolist())
-
-    return list(set(recomendacoes))
-
-#Janela Final
-
-#IDEIA GERAL (só quis colocar mesmo)
-
-#fazer um sistema/programa(ou sei lá qual o nome certo), aonde quando inicia o codigo ele vai primeiramente listar as 5 melhores series -> feito
-#(precisa ver se tem como deixar as 5 melhores atualmente e não as 5 melhores com avaliação embora não sei se é possivel fazer isso) -> 
-# Depois de aparecer as 5 melhores dai então aparece a seguinte pergunta "Digite algumas séries que você gosta (separadas por vírgula): " ->
-#dai então pegar um certo numero de series parecidas com aquelas que ele digitou e colocar em ordem de avaliação ou algo do tipo
-
-#IDEIAS LOUCAS QUE EU ESTOU PENSANDO 
-#Ao invés da mensagem sair do terminar <- sotaque até na digitação kkkkk erre, faz alguma coisa para abrir uma pagina separa quase igual ao negocio do olho do peixe dai nessa janela ->
-#aparece as 5 melhores series e depois faz as perguntas e traz as melhores series baseadas na escolha do usuario
-
-#Comandos aleatorios que talvez vai precisar usar kkkkkk
-
-#serie = input("Digite o nome da série: ") - Um exemplo de pergunta aonde a pessoa -
-#vai precisar digitar o nome das series (precisa ver como vai fazer para colocar varios nomes)
-
-
-
-#janela = tk.Tk()
-
-#janela.title("Recomendador de Séries")
-#janela.geometry("500x400")
-
-#texto = tk.Label(janela, text="Sistema de Recomendação de Séries", font=("Arial", 16))
-#texto.pack(pady=20)
-
-#janela.mainloop()
-
-#COISAS QUE ESTAVAM SENDO USADA E AGORA ESTÃO COMENTADAS
-
-
-#series = []
-
-#for s in dados:
-    #series.append({
-        #"titulo": s["name"],
-        #"genero": ",".join(s["genres"]),
-        #"rating": s["rating"]["average"] if s["rating"]["average"] else 0,
-        #"ano":s["premiered"]
-    #})
-
-#df = pd.DataFrame(series)
-
-#def recomendar_populares_recentes(df, n=10):
-
-    #df["ano"] = pd.to_datetime(df["ano"], errors="coerce")
-
-    #recentes = df[df["ano"].dt.year >= 2023]
-
-    #populares = recentes.sort_values(
-        #by="rating",
-        #ascending=False
-    #)
-
-    #return populares.head(n)
-#print("")
-#print("Séries mais populares recentes")
-#print("")
-
-#print(recomendar_populares_recentes(df)[["titulo","rating","ano"]])
-
-#print(recomendar_populares(df))
-
-#print("Top séries de 2025:")
-#print(top_2025[["titulo", "rating", "ano"]])
+    for serie, freq in contador.most_common(5):
+        print(f"- {serie}")
