@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="NextChoice é um site de recomendaçôes de séries, baseado gêneros, onde o usuário pode criar uma conta, avaliar as séries e receber recomendações personalizadas.">
+    <meta name="autor" content="André e Érica" >
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>NextChoice.com</title>
+</head>
+<body>
+<header>
+    <div class="logotipo">
+        <img class="logo" src="https://github.com/andrethiagoDEV/RecomendaSerie/blob/main/Logo2.png?raw=true" alt="Logo do NextChoice">
+                                
+
+        <h1>NextChoice</h1>
+    </div>
+
+    <div class="links">
+        <a href="#">Séries</a>
+        <a href="#">Gêneros</a>
+        <a href="#">Fazer login</a>
+    </div>
+</header>
+
+{% if busca_resultado %}
+    <p>Resultado: {{ busca_resultado }}</p>
+{% endif %} 
+
+<div class="search">
+<input type="text" id="input" placeholder="Digite séries (ex: Dark, Breaking Bad)">
+<button onclick="buscar()"><img src="https://github.com/andrethiagoDEV/RecomendaSerie/blob/main/lupa.png?raw=true" alt="Buscar"></button>
+</div>
+
+
+<div class="fundo_busca">
+<div id="carrossel-busca" style="display: none;">
+    <h2>Resultados da busca</h2>
+    <div id="resultado" class="grid-resultados"></div>
+</div>
+</div>
+<br>
+
+
+<div id="carrossel" class="grid-carrossel">
+    <div class="fundo_carrossel">
+    <h2>Séries mais vistas de 2025</h2>
+    <br>
+    <div class="carrossel-container">
+        <button class="carrossel-btn prev" onclick="moverCarrossel(-1)">&#10094;</button>
+        
+        <div class="carrossel-inner" id="top2025"></div>
+        
+        <button class="carrossel-btn next" onclick="moverCarrossel(1)">&#10095;</button>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="fundo_horror">
+
+<div id="genero_horror">
+    <h2>Terror</h2>
+    <div id="horror" class="grid-resultados"></div>
+</div>
+
+<div id="genero_acao">
+    <h2>Ação</h2>
+    <div id="action" class="grid-resultados"></div>
+</div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
