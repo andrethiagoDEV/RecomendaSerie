@@ -27,10 +27,10 @@ def top_2025():
 
     df["ano"] = pd.to_datetime(df["ano"], errors="coerce")
 
-    # 🔥 filtra séries mais recentes
+    # filtra séries mais recentes
     df_2025 = df[df["ano"].dt.year == 2025]
 
-    # 🔥 ordena por rating
+    # ordena por rating
     df_2025 = df_2025.sort_values(by="rating", ascending=False).head(15)
 
     resultado = []
@@ -43,7 +43,7 @@ def top_2025():
             "ano": int(linha["ano"].year) if pd.notnull(linha["ano"]) else ""
         })
 
-    print("TOP 2025:", resultado)  # 👈 DEBUG
+    print("TOP 2025:", resultado)
 
     return jsonify(resultado)
 
@@ -54,8 +54,6 @@ def horror():
 
     df = pd.read_csv("https://raw.githubusercontent.com/andrethiagoDEV/RecomendaSerie/refs/heads/main/series_tvmaze2.csv")
 
-    # 👇 aqui depende do nome da coluna (provavelmente "genero" ou "genres")
-    # ajuste se necessário
     df_terror = df[df["genero"].str.contains("Horror", case=False, na=False)]
 
     # ordena pelos melhores
@@ -96,5 +94,6 @@ def action():
     print("ACTION:", resultado)  
 
     return jsonify(resultado)
+
 # Rodar servidor
 app.run(debug=True)
