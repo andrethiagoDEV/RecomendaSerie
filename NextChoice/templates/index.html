@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="description" content="NextChoice é um site de recomendaçôes de séries, baseado gêneros, onde o usuário pode criar uma conta, avaliar as séries e receber recomendações personalizadas.">
     <meta name="autor" content="André e Érica" >
+    <!-- Conecta o arquivo CSS usando Flask (url_for) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>NextChoice.com</title>
 </head>
@@ -22,7 +23,8 @@
         <a href="#">Fazer login</a>
     </div>
 </header>
-
+<!-- Parte dinâmica do Flask:
+se existir resultado de busca, ele mostra -->
 {% if busca_resultado %}
     <p>Resultado: {{ busca_resultado }}</p>
 {% endif %} 
@@ -32,23 +34,25 @@
 <button onclick="buscar()"><img src="https://github.com/andrethiagoDEV/RecomendaSerie/blob/main/lupa.png?raw=true" alt="Buscar"></button>
 </div>
 
-
+<!-- Área que aparece após buscar -->
 <div class="fundo_busca">
+    <!-- Inicialmente escondido -->
 <div id="carrossel-busca" style="display: none;">
     <h2>Resultados da busca</h2>
+    <!-- Aqui os resultados serão inseridos via JavaScript -->
     <div id="resultado" class="grid-resultados"></div>
 </div>
 </div>
 <br>
 
-
+<!-- Carrossel principal -->
 <div id="carrossel" class="grid-carrossel">
     <div class="fundo_carrossel">
     <h2>Séries mais vistas de 2025</h2>
     <br>
     <div class="carrossel-container">
         <button class="carrossel-btn prev" onclick="moverCarrossel(-1)">&#10094;</button>
-        
+        <!-- Itens do carrossel serão inseridos via JS -->
         <div class="carrossel-inner" id="top2025"></div>
         
         <button class="carrossel-btn next" onclick="moverCarrossel(1)">&#10095;</button>
