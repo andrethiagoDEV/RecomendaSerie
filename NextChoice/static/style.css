@@ -1,8 +1,15 @@
+
+/* Base */
+
 body {
     margin: 0;
     padding: 0;
     background-color: #d3c2ff;
 }
+
+
+
+/* Topo */
 
 header {
     color: #ffffff;
@@ -11,7 +18,6 @@ header {
     padding: 20px;
     justify-content: space-between;
     align-items: center;
-
 }
 
 .logotipo {
@@ -27,22 +33,13 @@ header {
     object-fit: cover;
 }
 
-.search{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 80px; /* Ajuste este valor para mover para baixo */
-    margin-bottom: 20px;
-    position: relative;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+h1 {
+    font-size: 2em;
+    margin: 0;
 }
 
-h1 {
-    font-size: 2em; /* Tamanho aumentado para o título */
-    margin: 0; /* Remove margem padrão */
-}
+
+/* Links do header */
 
 .links {
     display: flex;
@@ -55,11 +52,73 @@ h1 {
     font-size: 1em;
 }
 
+.links a:hover {
+    opacity: 0.7;
+}
+
+
+/* Barra de Busca */
+
+.search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 80px; /* controla posição vertical */
+    margin-bottom: 20px;
+    position: relative;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* INPUT  */
+input {
+    padding: 8px 50px 8px 12px; /* espaço interno (direita maior por causa da lupa) */
+    width: 800px;
+    margin: 0;
+    border-radius: 20px;
+    border: 1px solid #24213d;
+    font-size: 1em;
+    position: relative;
+}
+
+/* Botão da lupa */
+button {
+    position: absolute;
+    right: 12px; /* posiciona dentro do input */
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+button img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+button:hover {
+    opacity: 0.7;
+}
+
+
+/* Carrosel Principal */
 
 #carrossel {
     margin: 20px auto;
     max-width: 1550px;
 }
+
+/* título da busca */
 #carrossel-busca h2 {
     color: black;
 }
@@ -80,6 +139,9 @@ h1 {
     flex: 0 0 200px;
     text-align: center;
 }
+
+
+/* Botões do carrossel */
 
 .carrossel-btn {
     position: absolute;
@@ -111,6 +173,9 @@ h1 {
     font-size: 2em;
 }
 
+
+/* Grid de Resultados */
+
 .grid-resultados {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -118,6 +183,9 @@ h1 {
     max-width: 1500px;
     margin: 0 auto;
 }
+
+
+/* Cards */
 
 .grid-resultados .card {
     text-align: center;
@@ -134,54 +202,18 @@ h1 {
     padding: 10px;
     border-radius: 8px;
     background-color: #d3c2ff;
-}   
-
-.links a:hover {
-    opacity: 0.7;
-}
-/* EU FIZ ISSO MAS NÃO FAÇO IDEIA COMO FUNCIONA */
-input {
-    padding: 8px 50px 8px 12px; /* Aumentei o padding-right para espaço da lupa */
-    width: 800px;
-    margin: 0;
-    border-radius: 20px;
-    border: 1px solid #24213d;
-    font-size: 1em;
-    position: relative; /* Para posicionar o botão dentro */
 }
 
-button {
-    position: absolute;
-    right: 12px; /* Posição dentro do input */
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    width: auto;
-    height: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
 
-button img {
-    width: 35px; /* Largura da imagem */
-    height: 35px; /* Altura da imagem */
-    object-fit: contain;
-}
-
-button:hover {
-    opacity: 0.7; /* Efeito ao passar o mouse */
-}
-
+/* Titulos*/
 
 h2 {
     color: #ffffff;
     margin-top: 40px;
 }
+
+
+/* Fundos (seções)*/
 
 .fundo_carrossel {
     background-color: #24213d;
@@ -200,4 +232,3 @@ h2 {
     padding: 10px;
     min-height: 40vh;
 }
-
