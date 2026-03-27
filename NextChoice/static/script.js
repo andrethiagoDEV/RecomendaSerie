@@ -1,4 +1,4 @@
-// 🔎 Função principal de busca
+// Função principal de busca
 async function buscar() {
     console.log("Botão clicado");
 
@@ -8,7 +8,7 @@ async function buscar() {
     const container = document.getElementById("resultado");
     const carrossel = document.getElementById("carrossel-busca");
 
-    // 🚨 evita busca vazia
+    //  evita busca vazia
     if (valor === "") {
         container.innerHTML = "<p>Digite algo para buscar</p>";
         carrossel.style.display = "block";
@@ -30,14 +30,14 @@ async function buscar() {
 
         container.innerHTML = "";
 
-        // ❌ nenhum resultado
+        // nenhum resultado
         if (!dados || dados.length === 0) {
             container.innerHTML = "<p>Nenhum resultado encontrado</p>";
             carrossel.style.display = "block";
             return;
         }
 
-        // ✅ renderiza resultados
+        // renderiza resultados
         dados.forEach(item => {
             const div = document.createElement("div");
 
@@ -52,7 +52,7 @@ async function buscar() {
             container.appendChild(div);
         });
 
-        // 👇 mostra carrossel só depois da busca
+        // mostra carrossel só depois da busca
         carrossel.style.display = "block";
 
     } catch (erro) {
@@ -62,9 +62,8 @@ async function buscar() {
     }
 }
 
-/////////////////////////////////////////////////////
 
-// ⌨️ ENTER para buscar
+// ENTER para buscar
 document.getElementById("input").addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -79,7 +78,7 @@ async function carregarTop2025() {
     const resposta = await fetch("/top2025");
     const dados = await resposta.json();
 
-    console.log("Dados recebidos:", dados); // 👈 IMPORTANTE
+    console.log("Dados recebidos:", dados); 
 
     const container = document.getElementById("top2025");
     container.innerHTML = "";
@@ -108,13 +107,13 @@ let autoplayInterval;
 function moverCarrossel(direcao) {
     const container = document.querySelector('#top2025');
     const itens = container.children.length;
-    const itensPorVisao = 4; // Ajuste conforme necessário
+    const itensPorVisao = 4; 
     indiceCarrossel += direcao;
 
     if (indiceCarrossel < 0) indiceCarrossel = 0;
     if (indiceCarrossel > itens - itensPorVisao) indiceCarrossel = itens - itensPorVisao;
 
-    const translateX = -indiceCarrossel * 210; // 200px + 10px gap
+    const translateX = -indiceCarrossel * 210; 
     container.style.transform = `translateX(${translateX}px)`;
 }
 
@@ -126,7 +125,7 @@ function iniciarAutoplay() {
         indiceCarrossel += 1;
 
         if (indiceCarrossel > itens - itensPorVisao) {
-            indiceCarrossel = 0; // Volta ao início
+            indiceCarrossel = 0; 
         }
 
         const translateX = -indiceCarrossel * 210;
@@ -175,9 +174,12 @@ async function carregarAcao() {
     const container = document.getElementById("action");
     container.innerHTML = "";
 
+    // Cria uma div para cada série
+    //Percorre os dados recebidos
     dados.forEach(item => {
         const div = document.createElement("div");
 
+        // Adiciona classe CSS
         div.classList.add("card");
 
         div.innerHTML = `
@@ -190,6 +192,7 @@ async function carregarAcao() {
     });
 }
 
+// Quando a página terminar de carregar
 window.onload = function() {
     carregarTop2025();
     carregarHorror();
