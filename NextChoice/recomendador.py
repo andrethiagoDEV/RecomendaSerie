@@ -3,14 +3,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
 
-# =========================
-# 📥 CARREGAR DATASET
-# =========================
+#carrega o dataset
 df = pd.read_csv("https://raw.githubusercontent.com/andrethiagoDEV/RecomendaSerie/refs/heads/main/series_tvmaze2.csv")
 
-# =========================
-# 🧹 LIMPEZA DOS DADOS
-# =========================
+#limpeza de dados
 df.columns = df.columns.str.strip().str.lower()
 
 df["titulo"] = df["titulo"].fillna("").str.strip()
@@ -18,34 +14,24 @@ df["genero"] = df["genero"].fillna("")
 df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0)
 df["ano"] = pd.to_datetime(df["ano"], errors="coerce")
 
-# 🔥 garante que coluna imagem existe
+# Garante que a imagem esteja na coluna
 if "imagem" not in df.columns:
     df["imagem"] = ""
 
-# =========================
-# ⚡ OTIMIZAÇÃO (performance)
-# =========================
+#Otimização
 df = df.sort_values(by="rating", ascending=False).head(3000).reset_index(drop=True)
 
-# =========================
-# 🧠 CRIA TEXTO PARA IA
-# =========================
+#Cria texto para IA
 df["conteudo"] = df["genero"] + " " + df["titulo"]
 
-# =========================
-# 🤖 VETORIZAÇÃO (TF-IDF)
-# =========================
+# Vetorização (TF-IDF)
 vectorizer = TfidfVectorizer(stop_words="english")
 matriz = vectorizer.fit_transform(df["conteudo"])
 
-# =========================
-# 🔗 MATRIZ DE SIMILARIDADE
-# =========================
+#matriz de similiaridade
 similaridade = cosine_similarity(matriz)
 
-# =========================
-# 🔍 BUSCA FLEXÍVEL
-# =========================
+#Busca flexivel
 def buscar_titulo(titulo):
     titulo = titulo.strip().lower()
 
@@ -56,9 +42,7 @@ def buscar_titulo(titulo):
 
     return resultados.iloc[0]["titulo"]
 
-# =========================
-# 🎬 FUNÇÃO PRINCIPAL
-# =========================
+#Função Principal
 def recomendar_series(favoritas):
 
     favoritas = favoritas.split(",")
@@ -67,7 +51,7 @@ def recomendar_series(favoritas):
     contador = Counter()
     resultados_finais = []
 
-    # 🔄 PARA CADA SÉRIE
+    # Para cada serie
     for serie in favoritas_validas:
 
         titulo = buscar_titulo(serie)
@@ -79,7 +63,7 @@ def recomendar_series(favoritas):
 
         scores = list(enumerate(similaridade[indice]))
 
-        # 🔥 ranking híbrido (similaridade + nota)
+        #ranking híbrido (similaridade + nota)
         scores = [
             (i, s * 0.7 + df.iloc[i]["rating"] * 0.3)
             for i, s in scores
@@ -92,9 +76,7 @@ def recomendar_series(favoritas):
         for i in recomendacoes:
             contador.update([df.iloc[i[0]]["titulo"]])
 
-    # =========================
-    # 🏆 RESULTADO FINAL
-    # =========================
+    #Resultado
     for serie, _ in contador.most_common(10):
 
         linha = df[df["titulo"] == serie].iloc[0]
@@ -106,7 +88,7 @@ def recomendar_series(favoritas):
             "ano": int(linha["ano"].year) if pd.notnull(linha["ano"]) else "N/A"
         })
 
-    # 🔥 evita retorno vazio
+    # evita retorno vazio
     if not resultados_finais:
         return [{
             "titulo": "Nenhuma recomendação encontrada",
